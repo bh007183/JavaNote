@@ -9,12 +9,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+
 
 @Entity
 public class User {
@@ -26,14 +28,12 @@ public class User {
 	
 	@Column(unique=true)
 	@NotNull
+	@Email
+	
 	private String email;
 	
 	@NotNull
-//	@Size(min = 8, max = 20)
-//	@Pattern(regexp = ("^(?=.*[a-z])"), message ="Password must contain lower case characers")
-//	@Pattern(regexp = ("^(?=.*[A-Z])"), message ="Password must contain upper case characers")
-//	@Pattern(regexp = ("^(?=.*[!@#&()–[{}]:;',?/*~$^+=<>])"), message ="Password must contain special characters")
-	
+	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
 	private String password;
 	
 	
@@ -56,18 +56,23 @@ public class User {
 		return this.email;
 		
 	}
+	
+	
 	public String getEmail() {
 		return email;
 	}
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public boolean verifyPassword(String password) {
-		return BCrypt.checkpw(password, this.password);
-	}
+//	public boolean verifyPassword(String password) {
+//		return BCrypt.checkpw(password, this.password);
+//	}
+	
 	public void setPassword(String password) {
-		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+
+		this.password = password;
 	}
+	
 	public String getPassword() {
 		return this.password;
 	}

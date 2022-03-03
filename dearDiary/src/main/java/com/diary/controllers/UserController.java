@@ -1,9 +1,5 @@
 package com.diary.controllers;
 
-
-
-
-
 import java.util.List;
 
 import javax.validation.Valid;
@@ -11,9 +7,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,11 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.diary.exceptions.AccountExistsException;
 import com.diary.exceptions.NoDataFoundException;
 import com.diary.exceptions.NoItemToDeleteException;
 import com.diary.exceptions.NotFoundException;
 import com.diary.models.User;
 import com.diary.models.UserDao;
+
 
 @RestController
 @RequestMapping("/api")
@@ -49,13 +47,19 @@ public class UserController {
 	
 	@PostMapping("/user")
 
-	public User postUser(@RequestBody @Valid User user){
+	public ResponseEntity<Object> postUser(@RequestBody @Valid User user){
 		
-			return userDao.save(user);
+		var exists = userDao.findByEmail(user.getEmail());
+		if(exists.isPresent()) {
+			throw new AccountExistsException();
+		}
+		user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
 		
-			
+		return ResponseEntity.accepted().body(userDao.save(user));
+	
 		
 		
+	   
 	}
 	
 // Detail
