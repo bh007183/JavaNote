@@ -1,9 +1,19 @@
 package com.diary.controllers;
 
+
+
+
+
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.diary.exceptions.NoDataFoundException;
+import com.diary.exceptions.NoItemToDeleteException;
+import com.diary.exceptions.NotFoundException;
 import com.diary.models.User;
 import com.diary.models.UserDao;
 
@@ -25,50 +38,47 @@ public class UserController {
 //	Generic
 	
 	@GetMapping("/users")
-	public ResponseEntity<Object> getUsers(){
-		return  ResponseEntity.accepted().body(userDao.findAll());
+	public List<User> getUsers(){
+		var users = (List<User>) userDao.findAll();
+		if(users.isEmpty()) {
+			throw new NoDataFoundException();
+		}
+		return users;
 	}
 	
+	
 	@PostMapping("/user")
-	public ResponseEntity<Object> postUser(@RequestBody User user){
-		System.out.println(user);
-		try {
-			User persistedUser = userDao.save(user);
-			return  ResponseEntity.accepted().body(persistedUser);
-		}catch(Exception e) {
-			return ResponseEntity.badRequest().body(e);
-		}
+
+	public User postUser(@RequestBody @Valid User user){
+		
+			return userDao.save(user);
+		
+			
+		
+		
 	}
 	
 // Detail
 	
-	
-	
 	@GetMapping("/user/{id}")
-	public ResponseEntity<Object> getUser(@PathVariable Long id){
-		System.out.println(id);
-		try {
-			return ResponseEntity.accepted().body(userDao.findById(id));
-		}catch(Exception e) {
-			return ResponseEntity.badRequest().body(e);
-		}
-		
+	public User getUser(@PathVariable Long id){
+			return userDao.findById(id).orElseThrow(() -> new NotFoundException(id));
 		
 	}
-	
+
 	@DeleteMapping("/user/{id}")
 	public ResponseEntity<Object>deleteUser(@PathVariable Long id){
-		try {
-			userDao.deleteById(id);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		}catch(Exception e) {
-			return ResponseEntity.badRequest().body(e);
-		}
+		if(userDao.existsById(id)) {
+			   userDao.deleteById(id);
+			   return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		   }else {
+			   throw new NoItemToDeleteException();
+		   }
 	}
 	
 	@PutMapping("/user/{id}")
 	public ResponseEntity<Object> updateUser(@PathVariable Long id,  @RequestBody User userDetails){
-		var user = userDao.findById(id).get();
+		var user = userDao.findById(id).orElseThrow(() -> new NotFoundException(id));;
 		
 		user.setPassword(userDetails.getPassword());
 		user.setEmail(userDetails.getEmail());

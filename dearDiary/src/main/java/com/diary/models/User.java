@@ -9,6 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -22,19 +25,24 @@ public class User {
 	private Long id;
 	
 	@Column(unique=true)
+	@NotNull
 	private String email;
 	
+	@NotNull
+//	@Size(min = 8, max = 20)
+//	@Pattern(regexp = ("^(?=.*[a-z])"), message ="Password must contain lower case characers")
+//	@Pattern(regexp = ("^(?=.*[A-Z])"), message ="Password must contain upper case characers")
+//	@Pattern(regexp = ("^(?=.*[!@#&()–[{}]:;',?/*~$^+=<>])"), message ="Password must contain special characters")
+	
 	private String password;
+	
 	
 	private Date date_added;
 	
 	public User () {
 		
 	}
-	public User(String email, String password) {
-		this.email = email;
-		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
-	}
+	
 	@PrePersist
 	public void setDate() {
 		this.date_added = new Date();
@@ -54,11 +62,14 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getPassword() {
-		return password;
+	public boolean verifyPassword(String password) {
+		return BCrypt.checkpw(password, this.password);
 	}
 	public void setPassword(String password) {
-		this.password = password;
+		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+	}
+	public String getPassword() {
+		return this.password;
 	}
 	public Long getId() {
 		return id;
