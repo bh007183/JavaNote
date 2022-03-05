@@ -33,7 +33,8 @@ public class User {
 	private String email;
 	
 	@NotNull
-	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
+	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!^&+=])(?=\\S+$).{8,}$", message="Password must be minimum of 8 charectors in length and contain numbers, upper, lower, and special charectors.")
+	
 	private String password;
 	
 	
@@ -54,9 +55,7 @@ public class User {
 	@Override
 	public String toString(){
 		return this.email;
-		
 	}
-	
 	
 	public String getEmail() {
 		return email;
@@ -64,9 +63,6 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-//	public boolean verifyPassword(String password) {
-//		return BCrypt.checkpw(password, this.password);
-//	}
 	
 	public void setPassword(String password) {
 
