@@ -1,0 +1,44 @@
+
+  .register-container{
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+
+}
+.register-form{
+    padding: 25px;
+    max-width: 900px;
+    min-height: 50%;
+    border-radius: 10px;
+    background-color: aqua;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+ 
+
+}
+.grid-item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-left: 0 auto;
+}
+.form-submit-button-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+@media only screen and (max-width: 538px) {
+
+.register-form{
+    height: 80%;
+    width: 80%;
+
+}
+    
+}
+  
+  
