@@ -2,7 +2,7 @@ package com.diary.models;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +17,8 @@ import javax.validation.constraints.Pattern;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 
 @Entity
@@ -36,7 +38,7 @@ public class User implements UserDetails{
 	
 	@NotNull
 	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!^&+=])(?=\\S+$).{8,}$", message="Password must be minimum of 8 charectors in length and contain numbers, upper, lower, and special charectors.")
-	
+	@JsonView
 	private String password;
 	
 	
@@ -52,7 +54,7 @@ public class User implements UserDetails{
 	}
 	
 	@OneToMany(mappedBy="note")
-	private Set<Note> notes;
+	private List<Note> notes;
 	
 	@Override
 	public String toString(){
@@ -78,12 +80,13 @@ public class User implements UserDetails{
 		return id;
 	}
 
-	public Set<Note> getNotes() {
-		return notes;
+	public List<Note> getNotes() {
+		return this.notes;
 	}
-	public void setNotes(Set<Note> notes) {
-		this.notes = notes;
+	public void setNotes(Note note) {
+		this.notes.add(note);
 	}
+	
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -106,7 +109,7 @@ public class User implements UserDetails{
 	@Override
 	public boolean isAccountNonLocked() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
